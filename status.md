@@ -3,7 +3,7 @@
 > Snapshot do estado atual. Atualizado a cada sessão.
 > Memória acumulada e histórico: [`memoria.md`](./memoria.md)
 
-**Última atualização:** 2026-10-04 15:45 -03
+**Última atualização:** 2026-10-04 16:20 -03
 **Máquina:** `qual-ano-do-ryzen-5-1400` (Ryzen 5 1400, RTX 3060)
 **Usuário:** wilson
 **Nome do projeto:** WBC NOMAD
@@ -24,7 +24,8 @@ Docker ausente, `/opt/project-nomad` inexistente, nenhum recurso baixado.
 |---|---|---|
 | Código-fonte | ✅ OK | `/home/wilson/WBC-NOMAD` — 21 MB, ~700 arquivos |
 | Versão | ✅ OK | 1.35.0 (igual à release upstream v1.35.0) |
-| `git` | ❌ Falta | Não instalado → repositório sem histórico |
+| `git` | ✅ OK | 2.43.0 instalado, identidade `Wilson Barbosa Coimbra` |
+| Repo GitHub pessoal | ✅ Sincronizado | `wwbcinformatica-gif/WBC-NOMAD` — branch `main`, 2 commits |
 | Docker | ❌ Falta | Não instalado, serviço `inactive` |
 | Docker Compose v2 | ❌ Falta | Exige plugin v2 (não serve o v1) |
 | `/opt/project-nomad/` | ❌ Falta | Nunca criado |
@@ -33,7 +34,7 @@ Docker ausente, `/opt/project-nomad` inexistente, nenhum recurso baixado.
 | Recursos (ZIM/mapas) | ⬜ Pendente | 0 baixados — 30 GB a 1 TB+ |
 | Modelos Ollama | ⬜ Pendente | 0 baixados |
 | Driver NVIDIA | ⚠️ Quebrado | Módulo não carregado (ver bloqueadores) |
-| Repo GitHub pessoal | ⚠️ Vazio | `wwbcinformatica-gif/WBC-NOMAD` sem nenhum commit |
+
 
 ---
 
@@ -42,14 +43,6 @@ Docker ausente, `/opt/project-nomad` inexistente, nenhum recurso baixado.
 ### 1. `sudo` exige senha
 Não tenho como digitar senha. Comandos com `sudo` precisam ser executados
 diretamente no terminal do usuário.
-
-### 2. `git` não instalado — impede popular o repositório
-O GitHub pessoal foi criado hoje (2026-10-04 18:39 UTC) mas está **vazio**
-(sem branch, sem commit). Para popular é preciso o `git`.
-
-```bash
-sudo apt-get update && sudo apt-get install -y git
-```
 
 ### 3. Driver NVIDIA não carregado
 ```
@@ -81,30 +74,17 @@ Responde automaticamente os 2 prompts (confirmação + aceite da licença Apache
 O log fica em `~/nomad-install.log` — importante porque o PC já desligou no meio
 de um processo antes.
 
-### 2. Instalar o `git`
+### 2. Sincronizar as atualizações de `status.md` / `memoria.md`
 ```bash
-sudo apt-get update && sudo apt-get install -y git
+cd /home/wilson/WBC-NOMAD && git add -A && git commit -m "docs: atualiza status" && git push
 ```
 
-### 3. Popular o repositório GitHub
-```bash
-cd /home/wilson/WBC-NOMAD
-git init -b main
-git remote add origin https://github.com/wwbcinformatica-gif/WBC-NOMAD.git
-git add .
-git commit -m "feat: NOMAD 1.35.0 + status.md/memoria.md"
-git push -u origin main
-```
-O `.gitignore` do próprio projeto já exclui `node_modules/`, senhas, chaves e
-compose local. Os dois ZIMs mini (4,2 MB + 4,4 MB) entram normalmente — nenhum
-arquivo passa de 5 MB.
-
-### 4. Recuperar a GPU
+### 3. Recuperar a GPU
 ```bash
 sudo modprobe nvidia && nvidia-smi
 ```
 
-### 5. Baixar os recursos
+### 4. Baixar os recursos
 Abrir `http://localhost:8080` → Easy Setup → escolher o que baixar.
 337 GB livres de 468 GB (25% usado) — suficiente, mas "baixar tudo" pode encher.
 
