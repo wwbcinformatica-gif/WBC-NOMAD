@@ -24,7 +24,8 @@ Docker ausente, `/opt/project-nomad` inexistente, nenhum recurso baixado.
 |---|---|---|
 | Código-fonte | ✅ OK | `/home/wilson/WBC-NOMAD` — 21 MB, ~700 arquivos |
 | Versão | ✅ OK | 1.35.0 (igual à release upstream v1.35.0) |
-| `git` | ✅ OK | 2.43.0 instalado, identidade `Wilson Barbosa Coimbra` |
+| `git` | ✅ OK | 2.43.0, identidade `Wilson Barbosa Coimbra` |
+| Workflows CI | ⏜ Excluídos | `.github/workflows/` no `.gitignore` — preservados em disco |
 | Repo GitHub pessoal | ✅ Sincronizado | `wwbcinformatica-gif/WBC-NOMAD` — branch `main`, 2 commits |
 | Docker | ❌ Falta | Não instalado, serviço `inactive` |
 | Docker Compose v2 | ❌ Falta | Exige plugin v2 (não serve o v1) |

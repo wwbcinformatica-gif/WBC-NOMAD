@@ -94,11 +94,32 @@ São os **únicos** `read` do script (o resto é `while read -r` em pipe).
 
 ## 4. Problemas conhecidos
 
-### `git` ausente no sistema
-Ubuntu sem pacote `git`. `sudo apt-get install -y git` resolve.
-Impacto: projeto foi baixado em ZIP (Python `urllib` + `zipfile`), sem `.git`,
-sem histórico, sem `git pull`. Atualizações vêm pelo `update_nomad.sh`, que
-baixa do GitHub — funciona mesmo sem `git` local.
+### `git` ausente no sistema — RESOLVIDO
+Instalado na S4 (`git 2.43.0`). Identidade configurada como
+`Wilson Barbosa Coimbra <233176178+wwbcinformatica-gif@users.noreply.github.com>`
+(noreply porque o e-mail público do usuário está privado no GitHub).
+
+Três erros previstos/learned no primeiro uso:
+
+1. **`Author identity unknown`** — falta `user.name`/`user.email` antes do primeiro
+   commit. Git aborta o commit mas **mantém tudo staged**; só repetir o commit após
+   configurar resolve.
+2. **`src refspec main does not match any`** — consequência do item 1, não um
+   problema separado: sem commit não existe branch local para enviar.
+3. **`refusing to allow a Personal Access Token to create or update workflow
+   .github/workflows/...`** — o GitHub exige escopo `workflow` no token para
+   versionar arquivos de CI. Decidido **não** dar esse poder ao token: a alternativa
+   foi adicionar `.github/workflows/` ao `.gitignore` e `git rm -r --cached`.
+   Os 7 workflows continuam no disco, só não sobem para o GitHub. Correto para
+   mirror de backup — o CI/CD do upstream não deve rodar no repo do usuário.
+
+Erro que **não** era culpa do token: no prompt de senha do terminal nada aparece
+(`stty` com `echo` desligado). É comportamento normal, não falha de colagem.
+
+### `credential.helper` não configurado
+O token é solicitado a cada push. Solução recomendada ao usuário:
+`git config --global credential.helper store` — digita o token uma única vez,
+fica em `~/.git-credentials` (local, permissão 600).
 
 ### `sudo` exige senha
 Não tenho acesso a senha. Comandos privilegiados são entregues prontos para
@@ -207,6 +228,16 @@ o push localmente e ativar `git config --global credential.helper store` para
 digitar o token uma única vez. Registrou na seção de decisões que o agente nunca
 pede senha nem segredo.
 
+### S4 — 2026-10-04 16:05→16:25
+Instalou `git 2.43.0` via apt. `git init`/`remote add`/`git add` OK (665 arquivos),
+mas o commit falhou por falta de identidade → configurou nome e e-mail noreply.
+O push falhou 2x: primeiro por causa do commit ausente (`src refspec`), depois
+por falta do escopo `workflow` no token (bloqueio dos 7 arquivos de CI).
+Usuário pediu "opção A" (dar escopo ao token) mas executou o comando da "opção B"
+(ignorar workflows); agente avisou, seguiu com a B e documentou. Pushing concluído:
+branch `main` criada no GitHub com 3 commits. Confirmado via API.
+Pendente: `credential.helper` para não pedir token a cada push.
+
 ### S2 — 2026-10-04 15:28→15:41
 Recuperou o contexto de `~/PROJETO NOMAD 1.txt` (única memória da S1).
 Verificou o sistema: Docker ausente, `/opt/project-nomad` inexistente, 337 GB livres,
@@ -242,6 +273,9 @@ pessoal (vazio) como destino das atualizações.
 7. **Registrar tudo em `status.md` + `memoria.md`, versionados no GitHub.**
    O PC já desligou e perdeu contexto uma vez; registro em arquivo + repo remoto
    é a mitigação.
+8. **Não versionar `.github/workflows/`.** O GitHub exigiria escopo `workflow` no
+   token — poder de alterar CI é grande demais para um token de backup. Os
+   arquivos seguem em disco, apenas fora do Git.
 
 ---
 
