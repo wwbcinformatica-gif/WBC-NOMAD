@@ -79,6 +79,7 @@ de um processo antes.
 ```bash
 cd /home/wilson/WBC-NOMAD && git add -A && git commit -m "docs: atualiza status" && git push
 ```
+O `credential.helper store` evita digitar o token a cada push.
 
 ### 3. Recuperar a GPU
 ```bash
