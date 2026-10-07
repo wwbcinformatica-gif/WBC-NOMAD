@@ -4,7 +4,7 @@
 > Memória acumulada e histórico: [memoria.md](./memoria.md)
 > Relato completo no Windows: [manual.md](./manual.md)
 
-**Última atualização:** 2026-10-06 (parte 7) — ✅ **STACK 100%** · 🔄 **Wikipédia PT baixando** · 🆕 **§16–§19 do manual escritos** (§19 = subir no **Linux e no Windows**)
+**Última atualização:** 2026-10-06 (parte 8 — **ENCERRAMENTO**) — ✅ **Projeto rodando no Windows** · ✅ **Push feito** · ✅ **Download cancelado e limpeza concluída** · 📖 **`manual.md` §16–§19**
 **Máquina:** `DESKTOP-9HVGSQB` — Windows 11 Enterprise LTSC (build 26100), AMD Ryzen 5 1400, 7,9 GB RAM
 **Local:** `G:\WBC-NOMAD`
 **Versão:** 1.35.1
@@ -32,19 +32,17 @@ O Project NOMAD **roda no Windows**. Painel `http://localhost:8080` → **HTTP 2
 
 ### Pendências
 1. ~~Apagar `G:\Local\Docker\backup_copia_1749`~~ — ✅ **feito** (198,9 GB liberados)
-2. 🔄 Baixar **Wikipédia PT** `wikipedia_pt_all_maxi_2026-05.zim` — **19,22 GB** — *em andamento* (22:08 → **3,28 GB = 17,1%**)
-   - destino: `/app/storage/zim/wikipedia_pt_all_maxi_2026-05.zim.part`
-   - ~1,2 MB/s → **ETA ~3,7 h**; retomável com `curl -C -`
-   - ⛔ **não reiniciar `nomad_admin` enquanto baixa** (mata o `curl`) — ver `manual.md` §16.3
-   - 👀 um monitor em background vigia e avisa ao concluir (ou se parar 15 min)
-3. 🔧 **APÓS o download:** `docker restart nomad_admin` — o `ECONNREFUSED` do Redis **já sumiu sozinho** e o Content Explorer **já está OK**, mas o restart deixa o cache 100% limpo — `manual.md` §18.5
-4. 🔧 Limpar `.zim.tmp` de 0 byte em `/app/storage/zim` — `manual.md` §18.6
-5. ~~Commit na branch `windows`~~ — ✅ **`01be6f4`** (6 arquivos, 2660 linhas; `docker-compose.yml` fora)
-6. ⏸️ Push para `origin` — **adiado pelo usuário**; sem credencial salva nesta máquina
-   - fazer pelo **Git Bash** ou **Git CMD**: `cd G:\WBC-NOMAD` → `git push -u origin windows`
-   - o Git Credential Manager abre a janela do GitHub pra autorizar
+2. ~~Baixar **Wikipédia PT** (19,22 GB)~~ — ❌ **CANCELADO pelo usuário** (06/10, 22:27)
+   - `curl` (PID 63) morto · `.part` excluído · **3,46 GB liberados**
+   - para retomar depois: `manual.md` §16.6 (`curl -fL -C -`), ou o botão **Download** da lista (19,22 GB)
+3. 🔧 `docker restart nomad_admin` — **PENDENTE**: o `ECONNREFUSED` do Redis **já sumiu sozinho** e o Content Explorer **já está OK**, então é só limpeza de cache. Adiado porque há **downloads ativos** (reiniciar os mataria) — `manual.md` §18.5
+4. ~~Limpar `.zim.tmp` de 0 byte~~ — ✅ **feito** (06/10, 22:30): **14 arquivos** apagados
+   - sobraram 5 `.tmp` com conteúdo (3 parciais que valem retomada + **2 ativos**)
+5. ~~Commit na branch `windows`~~ — ✅ **`01be6f4`** + **`9b9d6f1`** (7 arquivos; `docker-compose.yml` fora)
+6. ~~Push para `origin`~~ — ✅ **feito** (06/10, 22:10) — `windows` → `origin/windows`, tracking configurado, credencial no Git Credential Manager
 7. Instalar **Information Library** (Kiwix) → *Supply Depot*
 8. Considerar `AutoStart: true` — hoje `false`, o Docker não sobe no boot
+9. ℹ️ **Downloads ativos do usuário** (confirmados por ele): `pt.stackoverflow.com_mul_all_2026-02` e `wikisource_pt_all_maxi_2026-07` — **não reiniciar `nomad_admin` enquanto crescem**
 
 ---
 

@@ -764,3 +764,33 @@ project-nomad-managed`, `io.project-nomad.managed = true`.
   Documentado no `manual.md` §19 junto com os atalhos de cada sistema
   (`start_nomad.sh` / `stop_nomad.sh` / `update_nomad.sh` ×
   `iniciar-nomad.bat` / `start.bat`).
+
+### Encerramento da parte 6 (06/10/2026, 22:30)
+
+**O que saiu da lista nesta sessão:**
+
+| Pendência | Resultado |
+|---|---|
+| API do Docker travada | ✅ restaurada (`docker desktop stop` + `wsl --shutdown`) |
+| Content Explorer 500 / `ECONNREFUSED` | ✅ sumiu sozinho — sem reiniciar nada |
+| GPU em CPU | ✅ `docker restart nomad_ollama` → `CUDA0` na RTX 3060 |
+| Documentação §16–§19 | ✅ escrita |
+| Commit | ✅ `01be6f4` + `9b9d6f1` |
+| Push | ✅ `windows` → `origin/windows` (autenticação no navegador) |
+| `.tmp` de 0 byte | ✅ 14 apagados (3,46 GB do `.part` + 14 tmp) |
+
+**O que ficou aberto (4 itens):**
+
+1. `docker restart nomad_admin` — só limpeza de cache; adiado por causa dos
+   downloads ativos do usuário
+2. Instalar **Information Library** (Supply Depot)
+3. Decidir sobre `AutoStart: true`
+4. Retomar o download da **Wikipédia PT** (19,22 GB) quando quiser — o comando
+   está no `manual.md` §16.6
+
+**Aprendizado novo do fim:** o monitor em background avisou
+`CONCLUIDO (.zim ja existe): 202605 bytes` logo após eu apagar o `.part` — **falso
+positivo**. Os `206405` vieram dos dígitos do *nome do arquivo* (`2026-05`), não
+do tamanho: o script fazia `stat || echo FINAL_<caminho>` e o `replace('\D','')`
+pegou os dígitos do caminho. **Lição:** nunca confiar em número extraído de
+string sem antes garantir que a fonte é o `stat` e não o nome do arquivo.
