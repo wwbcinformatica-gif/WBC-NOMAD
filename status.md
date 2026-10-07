@@ -32,15 +32,17 @@ O Project NOMAD **roda no Windows**. Painel `http://localhost:8080` → **HTTP 2
 
 ### Pendências
 1. ~~Apagar `G:\Local\Docker\backup_copia_1749`~~ — ✅ **feito** (198,9 GB liberados)
-2. 🔄 Baixar **Wikipédia PT** `wikipedia_pt_all_maxi_2026-05.zim` — **19,22 GB** — *em andamento*
+2. 🔄 Baixar **Wikipédia PT** `wikipedia_pt_all_maxi_2026-05.zim` — **19,22 GB** — *em andamento* (22:08 → **3,28 GB = 17,1%**)
    - destino: `/app/storage/zim/wikipedia_pt_all_maxi_2026-05.zim.part`
-   - ~1,4 MB/s → **ETA ~3,5 h**; retomável com `curl -C -`
+   - ~1,2 MB/s → **ETA ~3,7 h**; retomável com `curl -C -`
    - ⛔ **não reiniciar `nomad_admin` enquanto baixa** (mata o `curl`) — ver `manual.md` §16.3
-3. 🔧 **APÓS o download:** `docker restart nomad_admin` para corrigir o **Redis com IP antigo**
-   → some o `ECONNREFUSED` e volta o **Content Explorer** (hoje dando 500) — `manual.md` §18.5
+   - 👀 um monitor em background vigia e avisa ao concluir (ou se parar 15 min)
+3. 🔧 **APÓS o download:** `docker restart nomad_admin` — o `ECONNREFUSED` do Redis **já sumiu sozinho** e o Content Explorer **já está OK**, mas o restart deixa o cache 100% limpo — `manual.md` §18.5
 4. 🔧 Limpar `.zim.tmp` de 0 byte em `/app/storage/zim` — `manual.md` §18.6
-5. Commit na branch `windows` (identidade pronta, `git commit` nunca executado)
-6. Push para `origin` (repo público, mas exige credencial)
+5. ~~Commit na branch `windows`~~ — ✅ **`01be6f4`** (6 arquivos, 2660 linhas; `docker-compose.yml` fora)
+6. ⏸️ Push para `origin` — **adiado pelo usuário**; sem credencial salva nesta máquina
+   - fazer pelo **Git Bash** ou **Git CMD**: `cd G:\WBC-NOMAD` → `git push -u origin windows`
+   - o Git Credential Manager abre a janela do GitHub pra autorizar
 7. Instalar **Information Library** (Kiwix) → *Supply Depot*
 8. Considerar `AutoStart: true` — hoje `false`, o Docker não sobe no boot
 
