@@ -1,20 +1,48 @@
 # STATUS — WBC NOMAD
 
 > Snapshot do estado atual. Atualizado a cada sessão.
-> Memória acumulada e histórico: [`memoria.md`](./memoria.md)
+> Memória acumulada e histórico: [memoria.md](./memoria.md)
+> Relato completo no Windows: [manual.md](./manual.md)
 
-**Última atualização:** 2026-10-04 16:20 -03
-**Máquina:** `qual-ano-do-ryzen-5-1400` (Ryzen 5 1400, RTX 3060)
-**Usuário:** wilson
-**Nome do projeto:** WBC NOMAD
-**Versão do código:** 1.35.0
+**Última atualização:** 2026-10-06 (parte 7) — ✅ **STACK 100%** · 🔄 **Wikipédia PT baixando** · 🆕 **§16–§19 do manual escritos** (§19 = subir no **Linux e no Windows**)
+**Máquina:** `DESKTOP-9HVGSQB` — Windows 11 Enterprise LTSC (build 26100), AMD Ryzen 5 1400, 7,9 GB RAM
+**Local:** `G:\WBC-NOMAD`
+**Versão:** 1.35.1
+
+> 🆕 **Tudo que é problema + solução agora está no `manual.md` §16–§19:**
+> - **§16** = tabela de problemas com sintoma → causa → solução (§16.1 é a tabela rápida)
+> - **§17** = guia de quem **só usa** o NOMAD (sem terminal)
+> - **§18** = runbook de quem **administra** (diagnóstico + recuperação de emergência)
+> - **§19** = **como subir o NOMAD em Linux e em Windows**, lado a lado
 
 ---
 
 ## Resumo
 
-Código-fonte completo na máquina. **Instalação ainda não executada.**
-Docker ausente, `/opt/project-nomad` inexistente, nenhum recurso baixado.
+O Project NOMAD **roda no Windows**. Painel `http://localhost:8080` → **HTTP 200**, **23 containers**, engine `29.8.2`.
+
+**Dois bugs do template Linux corrigidos** (detalhe em [manual.md](./manual.md)):
+
+| # | Bug | Correção | Seção |
+|---|---|---|---|
+| 1 | `/:/host:ro,rslave` recusado pelo WSL2 | trocar por `/:/host:ro` | §12 |
+| 2 | **`ENOSPC`** — dados num tmpfs de 1,9 GB **na RAM** | migrar `/opt/project-nomad` → **`/var/lib/nomad`** | §13 |
+| 3 | `localhost` morto pelo `wslrelay` (IPv6) | `Stop-Process -Name wslrelay` | §15 |
+| 4 | Disco em `C:` (198,85 GB) | **✅ migrado para `G:` — `C:` ganhou 196 GB** | §14 |
+
+### Pendências
+1. ~~Apagar `G:\Local\Docker\backup_copia_1749`~~ — ✅ **feito** (198,9 GB liberados)
+2. 🔄 Baixar **Wikipédia PT** `wikipedia_pt_all_maxi_2026-05.zim` — **19,22 GB** — *em andamento*
+   - destino: `/app/storage/zim/wikipedia_pt_all_maxi_2026-05.zim.part`
+   - ~1,4 MB/s → **ETA ~3,5 h**; retomável com `curl -C -`
+   - ⛔ **não reiniciar `nomad_admin` enquanto baixa** (mata o `curl`) — ver `manual.md` §16.3
+3. 🔧 **APÓS o download:** `docker restart nomad_admin` para corrigir o **Redis com IP antigo**
+   → some o `ECONNREFUSED` e volta o **Content Explorer** (hoje dando 500) — `manual.md` §18.5
+4. 🔧 Limpar `.zim.tmp` de 0 byte em `/app/storage/zim` — `manual.md` §18.6
+5. Commit na branch `windows` (identidade pronta, `git commit` nunca executado)
+6. Push para `origin` (repo público, mas exige credencial)
+7. Instalar **Information Library** (Kiwix) → *Supply Depot*
+8. Considerar `AutoStart: true` — hoje `false`, o Docker não sobe no boot
 
 ---
 
@@ -22,86 +50,160 @@ Docker ausente, `/opt/project-nomad` inexistente, nenhum recurso baixado.
 
 | Componente | Status | Detalhe |
 |---|---|---|
-| Código-fonte | ✅ OK | `/home/wilson/WBC-NOMAD` — 21 MB, ~700 arquivos |
-| Versão | ✅ OK | 1.35.0 (igual à release upstream v1.35.0) |
-| `git` | ✅ OK | 2.43.0, identidade `Wilson Barbosa Coimbra` |
-| Workflows CI | ⏜ Excluídos | `.github/workflows/` no `.gitignore` — preservados em disco |
-| Repo GitHub pessoal | ✅ Sincronizado | `wwbcinformatica-gif/WBC-NOMAD` — branch `main`, 2 commits |
-| Docker | ❌ Falta | Não instalado, serviço `inactive` |
-| Docker Compose v2 | ❌ Falta | Exige plugin v2 (não serve o v1) |
-| `/opt/project-nomad/` | ❌ Falta | Nunca criado |
-| Command Center | ⬜ Pendente | Containers não sobem |
-| Painel web | ⬜ Pendente | Esperado em `http://localhost:8080` |
-| Recursos (ZIM/mapas) | ⬜ Pendente | 0 baixados — 30 GB a 1 TB+ |
-| Modelos Ollama | ⬜ Pendente | 0 baixados |
-| Driver NVIDIA | ⚠️ Quebrado | Módulo não carregado (ver bloqueadores) |
+| Código-fonte | ✅ OK | 659 arquivos + `start.bat`, `manual.md`, `ativar-wsl2.bat` |
+| Branch | 🌿 `windows` | tudo *staged*; `docker-compose.yml` **fora** do git (senhas) |
+| Commit | ⬜ Pendente | identidade **pronta** (`Wilson Barbosa Coimbra`); `git commit` nunca executado |
+| Docker Desktop | ✅ OK | 4.94.0 · CLI 29.8.2 · Compose v5.5.1 |
+| Engine | ✅ OK | `wsl2` · **v29.8.2** |
+| **Stack** | ✅ **NO AR** | **23 containers** · `nomad_admin` **healthy** |
+| **Painel `:8080`** | ✅ **HTTP 200** | testar com `127.0.0.1` (ver aviso 5 ↓) |
+| Dozzle `:9999` | ✅ OK | logs |
+| **Storage / MySQL / Redis** | ✅ **NO DISCO** | `/var/lib/nomad` — ver aviso ↓ |
+| ENOSPC / crash loop | ✅ **RESOLVIDO** | era 24 reinícios; agora **nenhum** no log |
+| `rslave` do disk-collector | ✅ Corrigido | §12 |
+| **GPU (RTX 3060)** | ✅ **FUNCIONANDO** | `CUDA0` na descoberta; **regrediu p/ CPU após restart brusco → `docker restart nomad_ollama` consertou** (§16.8) |
+| **AI Assistant / Ollama** | ✅ **INSTALADO** | `nomad_ollama` · `ollama/ollama:0.33.3` · `nomic-embed-text:v1.5` · API `http=200` |
+| 🆕 **API do Docker (21:14)** | ✅ **RESTAURADA** | travava (`docker ps` pendurado) → `docker desktop stop` + `wsl --shutdown` + AppID · 4 min (§18.4) |
+| 🆕 **Redis / Content Explorer** | ✅ **CONSERTEI** | `ECONNREFUSED` sumiu sozinho após restart · `nomad_admin` **healthy** · 500 sumiu |
+| 🆕 **Arquitetura compose** | ℹ️ 2 projetos | `project-nomad` (6, seu YAML) + `project-nomad-managed` (17, criados pelo NOMAD) — §18.8 |
+| **Downloads (Kiwix)** | ✅ **CONCLUÍDOS** | fila `downloads` zerada · **46 ZIMs** · DNS ok |
+| **RAG / embeddings** | 🔄 Em fila | 4 falhos limpos · **37 re-enfileirados** (`/api/rag/sync`) |
+| **Disco do Docker** | ✅ **NO `G:`** | `G:\Local\Docker\Wsl\DockerDesktopWSL` · 198,85 GB · `CustomWslDistroDir` gravada · `C:` **+196 GB** |
+| App **Information Library** (Kiwix) | ⬜ Pendente | Supply Depot → instalar |
+| Wikipédia PT | ⬜ Pendente | 19,22 GB, `q=portugues` no catálogo |
+| Modelos Ollama (host) | ⚠️ | 16,3 GB em `C:\Users\User\.ollama\models` |
 
-
----
-
-## Bloqueadores
-
-### 1. `sudo` exige senha
-Não tenho como digitar senha. Comandos com `sudo` precisam ser executados
-diretamente no terminal do usuário.
-
-### 3. Driver NVIDIA não carregado
-```
-nvidia-smi → "couldn't communicate with the NVIDIA driver"
-lsmod | grep nvidia → vazio
-```
-Apesar disso o módulo existe e está assinado:
-- `/lib/modules/7.0.0-38-generic/updates/dkms/nvidia.ko.zst`
-- DKMS `nvidia/580.178.04` instalado para 6.17.0-20 e 7.0.0-38
-- SecureBoot ativo com MOK válido
-
-O `lspci -k` não mostra driver vinculado à GA104 — nem o `nouveau`.
-Suspeita: queda abrupta de energia deixou o módulo descarregado.
-**Não bloqueia o NOMAD** — o instalador só avisa (`return 0`), nunca aborta.
-
-```bash
-sudo modprobe nvidia && nvidia-smi
-```
+**Bloqueadores: nenhum** — a stack está de pé e funcional.
 
 ---
 
-## Próximos passos
+## ⚠️ Avisos operacionais
 
-### 1. Instalar o NOMAD (bloqueia todo o resto)
-```bash
-printf 'y\ny\n' | sudo bash /home/wilson/WBC-NOMAD/install/install_nomad.sh 2>&1 | tee ~/nomad-install.log
+### 1. ONDE FICAM OS DADOS (não mexer sem ler)
+
+| | Caminho | Filesystem | Livre |
+|---|---|---|---|
+| ❌ **ANTES (bug)** | `/opt/project-nomad` | **tmpfs 1,9 GB (RAM)** | **0 bytes** → ENOSPC |
+| ✅ **AGORA** | **`/var/lib/nomad`** | `/dev/sdf` = `docker_data.vhdx` (ext4) | **948,3 GB** |
+
+`
+admin:          /var/lib/nomad/storage -> /app/storage
+mysql:          /var/lib/nomad/mysql   -> /var/lib/mysql
+redis:          /var/lib/nomad/redis   -> /data
+updater:        /var/lib/nomad         -> /var/lib/nomad
+disk-collector: /var/lib/nomad/storage -> /storage
+NOMAD_STORAGE_PATH = /var/lib/nomad/storage   ← tem de bater igual
+`
+
+> 🔴 **Nunca voltar para `/opt/project-nomad`.** No Docker Desktop/WSL2 esse
+> caminho cai no rootfs overlay da VM, cujo *upperdir* é tmpfs de 1,9 GB na RAM:
+> enche rápido, dá `ENOSPC` e **some em todo restart da VM**.
+
+### 2. Se regerar o `docker-compose.yml`
+O arquivo **não entra no git** (contém senhas). Se vier de novo de
+`install\management_compose.yaml`, **reaplicar as 2 correções**:
+- §12 → `/:/host:ro` (sem `rslave`)
+- §13 → os 7 caminhos `/opt/project-nomad` → `/var/lib/nomad`
+
+### 3. RAM — 7,9 GB no total
+VM limitada a **3,79 GB**; NOMAD ~1,15 GB. Livre após a migração: **+1,9 GB**
+(o tacho de RAM foi esvaziado). Ainda assim: **nunca rode Ollama com modelo
+carregado junto com o NOMAD** → `ollama stop` antes.
+
+### 4. Dados do Docker — onde estão hoje
+**No `G:`** — `G:\Local\Docker\Wsl\DockerDesktopWSL\disk\docker_data.vhdx`
+(**198,85 GB**). O `C:` ficou com **327,9 GB livres** (+196 GB).
+
+Configuração que mantém isso (em `%APPDATA%\Docker\settings-store.json`):
+
+```json
+"CustomWslDistroDir": "G:\\Local\\Docker\\Wsl\\DockerDesktopWSL"
 ```
-Responde automaticamente os 2 prompts (confirmação + aceite da licença Apache 2.0).
-O log fica em `~/nomad-install.log` — importante porque o PC já desligou no meio
-de um processo antes.
 
-### 2. Sincronizar as atualizações de `status.md` / `memoria.md`
-```bash
-cd /home/wilson/WBC-NOMAD && git add -A && git commit -m "docs: atualiza status" && git push
+> ⚠️ **Não mexer nessa chave nem apagar a pasta.** Se voltar pro `C:`, ver
+> [manual.md](./manual.md) §14 (procedimento e "o que NÃO fazer").
+>
+> ✅ O backup `G:\Local\Docker\backup_copia_1749` (198,9 GB) foi **apagado** após
+> a validação (23 containers, painel 200, storage 197 GB) — `G:` está com
+> **1393 GB livres**.
+
+### 5. `localhost` não responde mas o container está de pé
+Quase sempre é o **`wslrelay.exe`** preso em `[::1]:8080` (aceita TCP e não
+responde). O `localhost` do Windows tenta IPv6 primeiro e dá timeout.
+
+```powershell
+# diagnosticar: se 127.0.0.1 responder e localhost não, é isso
+Invoke-WebRequest http://127.0.0.1:8080 -TimeoutSec 10
+Stop-Process -Name wslrelay -Force      # some até o próximo wsl --shutdown
 ```
-O `credential.helper store` evita digitar o token a cada push.
 
-### 3. Recuperar a GPU
-```bash
-sudo modprobe nvidia && nvidia-smi
+### 6. Docker não sobe / `no route to host` na VM
+Sintoma: `docker version` e `wsl -d docker-desktop` em timeout, log com
+`connect tcp 192.168.65.7:2376: no route to host`. Correção:
+
+```powershell
+# fechar Docker Desktop, depois:
+wsl --shutdown
+# e relançar PELO APPID (o exe direto falha com "no argument received")
+$a = Get-StartApps | Where-Object Name -match 'Docker'
+Start-Process explorer.exe -ArgumentList "shell:AppsFolder\$($a.AppID)"
 ```
-
-### 4. Baixar os recursos
-Abrir `http://localhost:8080` → Easy Setup → escolher o que baixar.
-337 GB livres de 468 GB (25% usado) — suficiente, mas "baixar tudo" pode encher.
 
 ---
 
-## Referência rápida
+## Wikipédia PT — onde buscar
+
+- Seção **"Wikipedia"** do Content Explorer = **só inglês** (`collections/wikipedia.json`)
+- **Certo:** Content Explorer → **Browse the Kiwix Library** → busca **`portugues`**
+- API: `/api/zim/list-remote?query=portugues` (usa `q=` + `lang=por`)
+
+| Arquivo | Tamanho |
+|---|---|
+| `wikipedia_pt_top_mini_2026-07` | 160 MB |
+| `wikipedia_pt_all_mini_2026-05` | 1,59 GB |
+| `wikipedia_pt_top_maxi_2026-07` | 3,29 GB |
+| `wikipedia_pt_all_nopic_2026-05` | 6,59 GB |
+| **`wikipedia_pt_all_maxi_2026-05`** | **19,22 GB** ← escolhido |
+
+---
+
+## Operação do dia a dia
+
+**LIGAR — dia a dia (clique duplo):**
+
+```bat
+G:\WBC-NOMAD\iniciar-nomad.bat
+   abre o Docker Desktop -> espera o engine -> espera os containers
+   -> confere o painel -> abre o navegador
+   (testado hoje: 23 containers, HTTP 200, ~1 min com tudo pronto)
+```
+
+**GERENCIAR — menu completo:**
+
+```bat
+G:\WBC-NOMAD\start.bat
+   [1] Iniciar   [2] Parar    [3] Status
+   [4] Logs      [5] Painel   [6] Sair
+```
+
+**DESLIGAR** (libera ~3 GB de RAM): `docker desktop stop`
+
+> `AutoStart` está **`false`** — o Docker **não** sobe sozinho no login, de
+> propósito: ele consome ~3 GB dos 7,92 GB de RAM e o `C:` vai ser usado pra
+> outros projetos. Se preferir automático: Settings → General →
+> *Start Docker Desktop when you sign in*.
 
 | Item | Valor |
 |---|---|
-| Código local | `/home/wilson/WBC-NOMAD` |
-| Dir de instalação | `/opt/project-nomad` |
+| **Ligar tudo** | `G:\WBC-NOMAD\iniciar-nomad.bat` (clique duplo) |
+| Gerenciar / parar stack | `G:\WBC-NOMAD\start.bat` (menu) |
 | Painel | `http://localhost:8080` |
+| Logs (Dozzle) | `http://localhost:9999` |
+| Information Library | `http://localhost:8090` (após instalar) |
+| Compose | `G:\WBC-NOMAD\docker-compose.yml` (fora do git) |
+| Correções manuais | `manual.md` §12 (rslave) + §13 (ENOSPC) + §14 (disco `G:`) + §15 (`wslrelay`) |
+| Problemas + soluções | `manual.md` §16 (tabela dos 18 problemas) + §17 (usuário) + §18 (admin) |
+| **Subir no Linux / Windows** | `manual.md` **§19** |
+| `origin/main` | `adb390039a2ae14712f91279ef4bbeb42880ca37` |
+| Repo pessoal | `wwbcinformatica-gif/WBC-NOMAD` (público) |
 | Upstream | `Crosstalk-Solutions/project-nomad` |
-| Repo pessoal | `wwbcinformatica-gif/WBC-NOMAD` |
-| Sessões anteriores | `~/PROJETO NOMAD 1.txt`, `~/PROJETO NOMAD 2.txt` |
-| Log da instalação | `~/nomad-install.log` |
-| Start / Stop | `/opt/project-nomad/start_nomad.sh` · `stop_nomad.sh` |
-| Atualizar | `/opt/project-nomad/update_nomad.sh` |
