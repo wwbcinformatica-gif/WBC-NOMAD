@@ -6,6 +6,58 @@
 
 ---
 
+## Guia rápido — como iniciar corretamente no Windows
+
+**Se o Docker ainda não foi iniciado, dê duplo clique em:**
+
+```text
+G:\WBC-NOMAD\iniciar-nomad.bat
+```
+
+**Não é necessário executar os dois arquivos para ligar o NOMAD.** Eles têm funções diferentes:
+
+| Arquivo | Quando usar | O que faz |
+|---|---|---|
+| **`iniciar-nomad.bat`** | **Ligar no dia a dia, inclusive com o Docker fechado** | Tenta abrir o Docker Desktop, aguarda o engine e os containers, verifica o painel e abre o navegador. |
+| **`start.bat`** | Gerenciar, consultar status/logs ou iniciar a stack com o Docker já funcionando | Abre um menu. A opção **1** executa `docker compose up -d`; **2** para os serviços do compose; **3** mostra seu status; **4** mostra os logs do painel. **Não liga o Docker Desktop.** |
+
+### Sequência normal
+
+1. Execute **`iniciar-nomad.bat`** e aguarde o Docker terminar de iniciar. Isso pode levar alguns minutos.
+2. Acesse **http://127.0.0.1:8080**. O script abre `http://localhost:8080`, mas, nesta máquina, `localhost` já apresentou falha de encaminhamento IPv6; prefira `127.0.0.1` se não responder (§15).
+3. Para usar a IA, confira no painel se o **AI Assistant / Ollama** está iniciado e se existe um **modelo de conversa instalado e selecionado**. O painel abrir não garante, por si só, que a IA esteja pronta.
+4. Se o Docker estiver pronto, mas o painel não abrir, execute **`start.bat` → opção 1**. Depois consulte **opção 3** (status) e **opção 4** (logs) se necessário.
+
+### Atenção às limitações do script atual
+
+- `iniciar-nomad.bat` só tenta `docker compose up -d` quando **não há nenhum container em execução no Docker**. Se outro projeto estiver ativo ou a stack estiver parcialmente parada, ele pode apenas aguardar sem iniciar os serviços que faltam. Nesse caso, com o Docker pronto, use **`start.bat` → opção 1**.
+- Ele aguarda **20 ou mais containers no total**, não apenas os do NOMAD. Esse número é uma expectativa da instalação antiga, **não um requisito do NOMAD**: pode acusar falha numa instalação menor ou considerar containers de outros projetos. Verifique o painel e os serviços necessários, não apenas a contagem.
+- Para executar manualmente o Compose, use o diretório correto, pois o `iniciar-nomad.bat` atual não fixa o diretório antes de chamar `docker compose`:
+
+  ```bat
+  cd /d G:\WBC-NOMAD
+  docker compose -f "G:\WBC-NOMAD\docker-compose.yml" up -d
+  ```
+
+- O compose principal gerencia os serviços básicos. Apps instalados pelo painel, como o Ollama, podem pertencer à stack **`project-nomad-managed`** (§18.8); o status do compose principal não mostra necessariamente todos eles.
+
+### Se a IA não responder
+
+- **Docker desligado = NOMAD indisponível.** O Ollama instalado diretamente no Windows pode continuar respondendo em `127.0.0.1:11434`, mas é separado do Ollama gerenciado pelo NOMAD. Um não comprova que o outro está funcionando.
+- Nesta máquina há aproximadamente **8 GB de RAM**. O Docker consome memória adicional; evite carregar modelos simultaneamente no Ollama do Windows e no do NOMAD. Modelos grandes podem exceder a memória disponível. Para um primeiro teste, prefira um modelo pequeno compatível com a memória/GPU disponível.
+- Não altere a configuração para usar o Ollama do Windows sem verificar a conectividade a partir do container: `localhost` dentro do container aponta para o próprio container, não para o Windows.
+- Para diagnóstico detalhado, veja **§16** (problemas conhecidos) e **§18** (comandos de diagnóstico e recuperação).
+
+**Para desligar o Docker e liberar memória:**
+
+```powershell
+docker desktop stop
+```
+
+> As seções seguintes preservam o histórico da instalação. Afirmações antigas como “Docker não instalado” descrevem aquele momento, não uma verificação do estado atual da máquina.
+
+---
+
 ## 1. O que é o Project NOMAD
 
 Servidor de conhecimento e educação **offline-first**, da Crosstalk Solutions
